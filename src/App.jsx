@@ -9,7 +9,9 @@ const App = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [question, setQuestion] = useState("");
   const [data, setData] = useState([]);
-  const [recentQuestions, setRecentQuestions] = useState(JSON.parse(localStorage.getItem("questions")));
+  const [recentQuestions, setRecentQuestions] = useState(
+    JSON.parse(localStorage.getItem("questions")) || []
+  );
 
   const GEMINI_API_KEY = "AIzaSyDgrivbfetqlWmpRyCm6cKvgkN7qNLZczQ";
 
@@ -62,6 +64,12 @@ const App = () => {
     }
   };
 
+  const clerSearches = () => {
+    localStorage.removeItem('questions')
+    setRecentQuestions([]);
+
+  };
+
   return (
     <>
       <div className="grid grid-cols-5 text-center h-screen">
@@ -78,11 +86,40 @@ const App = () => {
               {isCollapsed ? "➡" : "⬅"}
             </button>
           </div>
+          <div className="flex justify-between">
+            <h3 className="text-xl text-zinc-200 text-left pl-5 ">
+              Recent search
+            </h3>
+            <button className="pe-5 cursor-pointer " onClick={clerSearches}>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                height="24px"
+                viewBox="0 -960 960 960"
+                width="24px"
+                fill="#e3e3e3"
+              >
+                <path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z" />
+              </svg>
+            </button>
+          </div>
           {!isCollapsed && (
-            <ul className="text-white p-4 space-y-4">
-             {recentQuestions && recentQuestions.map((item)=>(
-              <li className="border-2 ">{item}</li>
-             ))}
+            <ul className="text-white p-4  text-left overflow-auto text-sm">
+              {recentQuestions &&
+              recentQuestions.filter((item) => item.trim() !== "").length >
+                0 ? (
+                recentQuestions
+                  .filter((item) => item.trim() !== "")
+                  .map((item, i) => (
+                    <li
+                      key={i}
+                      className="block p-1 pl-4 text-zinc-300 cursor-pointer hover:bg-zinc-700 truncate"
+                    >
+                      {item}
+                    </li>
+                  ))
+              ) : (
+                <li className="text-zinc-500 italic">No recent searches</li>
+              )}
             </ul>
           )}
         </div>
