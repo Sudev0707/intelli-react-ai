@@ -3,11 +3,12 @@ import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
 import "./App.css";
 import { GEMINI_URL } from "./constants";
+import Answers from "./components/Answers";
 
 const App = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [question, setQuestion] = useState("");
-  const [data, setData] = useState("");
+  const [data, setData] = useState([]);
 
   const GEMINI_API_KEY = "AIzaSyDgrivbfetqlWmpRyCm6cKvgkN7qNLZczQ";
 
@@ -30,9 +31,19 @@ const App = () => {
       });
       const result = await res.json();
 
-      setData(result.candidates[0].content.parts[0].text);
+      let unFormatData =
+        result.candidates?.[0]?.content?.parts?.[0]?.text || "";
 
-      console.log(result);
+      let formatedData = unFormatData.includes("* ")
+        ? unFormatData.split("* ").map((item) => item.trim())
+        : [unFormatData];
+
+      // setData([question, formatedData]);
+      setData([
+        ...data,
+        { type: "q", text: question },
+        { type: "a", text: formatedData },
+      ]);
     } catch (error) {
       console.log(error.message);
     }
@@ -64,7 +75,40 @@ const App = () => {
         </div>
 
         <div className="col-span-4 p-10">
-          <div className="container h-150 overflow-scroll ">{data}</div>
+          <div className="container h-150 overflow-y-scroll chat-scroll">
+            <div className="text-zinc-200 ">
+              <ul>
+                {data.map((item, index) =>
+                  item.type == "q" ? (
+                    <li
+                      key={index + Math.random()}
+                      className="text-left p-1 text-white"
+                    >
+                      <Answers ans={item.text} index={index} totalData={1} />
+                    </li>
+                  ) : (
+                    item.text.map((ansItem, ansIndex) => (
+                        <li
+                      key={ansIndex + Math.random()}
+                      className="text-left p-1 text-white"
+                    >
+                      <Answers ans={ansItem} index={ansIndex} totalData={item.length} />
+                    </li>
+                    ))
+                  )
+                )}
+
+                {/* {data?.map((item, index) => (
+                  <li
+                    key={index + Math.random()}
+                    className="text-left p-1 text-white"
+                  >
+                    <Answers ans={item} index={index} totalData={data.length} />
+                  </li>
+                ))} */}
+              </ul>
+            </div>
+          </div>
 
           <div className="  bg-zinc-800 w-1/2 p-1 pr-4  text-white m-auto rounded-4xl border border-zinc-700 flex h-16 ">
             <input
