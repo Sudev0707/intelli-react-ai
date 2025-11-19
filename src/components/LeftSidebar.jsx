@@ -10,8 +10,15 @@ const LeftSidebar = ({
 }) => {
   return (
     <div
-      className={` bg-zinc-800 h-full transition-all duration-300
-      ${isCollapsed ? "w-16 col-span-1" : "w-64 col-span-1"}`}
+      className={`
+        bg-zinc-800 h-full transition-all duration-300
+        ${isCollapsed ? "w-16" : "w-64"}
+        sm:${isCollapsed ? "w-16" : "w-64"}  // small screens
+        md:${isCollapsed ? "w-16" : "w-64"}  // medium screens
+        lg:${isCollapsed ? "w-20" : "w-64"}  // large screens
+        xl:${isCollapsed ? "w-20" : "w-64"}  // extra large screens
+        flex flex-col
+      `}
     >
       {/* Collapse Button */}
       <div className="p-4 flex justify-end">
@@ -38,15 +45,17 @@ const LeftSidebar = ({
           >
             <path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h357l-80 80H200v560h560v-278l80-80v358q0 33-23.5 56.5T760-120H200Zm280-360ZM360-360v-170l367-367q12-12 27-18t30-6q16 0 30.5 6t26.5 18l56 57q11 12 17 26.5t6 29.5q0 15-5.5 29.5T897-728L530-360H360Zm481-424-56-56 56 56ZM440-440h56l232-232-28-28-29-28-231 231v57Zm260-260-29-28 29 28 28 28-28-28Z" />
           </svg>
-          New Chat
+          {!isCollapsed && "New Chat"}
         </button>
       </div>
 
-      <div className="flex justify-between">
-        <h3 className="text-md text-zinc-200 text-left pl-5">Recent search</h3>
-
+      {/* Recent Searches Header */}
+      <div className="flex justify-between items-center px-5">
+        {!isCollapsed && (
+          <h3 className="text-md text-zinc-200 text-left">Recent search</h3>
+        )}
         <button
-          onClick={clearSearches} // make sure function name is correct
+          onClick={clearSearches}
           type="button"
           className="w-10 h-10 flex items-center justify-center cursor-pointer hover:bg-zinc-700 rounded"
         >
@@ -62,6 +71,7 @@ const LeftSidebar = ({
         </button>
       </div>
 
+      {/* Recent Questions */}
       {!isCollapsed && (
         <ul className="text-white p-4 text-left overflow-auto text-sm">
           {recentQuestions &&

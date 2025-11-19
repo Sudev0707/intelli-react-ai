@@ -6,6 +6,7 @@ import "./App.css";
 import { GEMINI_URL } from "./constants";
 import Answers from "./components/Answers";
 import LeftSidebar from "./components/leftSidebar";
+import Spinner from "./components/Spinner";
 
 const App = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -216,32 +217,7 @@ const App = () => {
 
           {loading && (
             <div className="flex items-center justify-center">
-              <svg
-                className="animate-spin"
-                width="40"
-                height="40"
-                viewBox="0 0 50 50"
-              >
-                <circle
-                  className="opacity-20"
-                  cx="25"
-                  cy="25"
-                  r="20"
-                  stroke="#4F46E5" /* dark purple ring */
-                  strokeWidth="4"
-                  fill="none"
-                />
-                <circle
-                  cx="25"
-                  cy="25"
-                  r="20"
-                  stroke="#A855F7" /* bright purple arc */
-                  strokeWidth="4"
-                  strokeLinecap="round"
-                  strokeDasharray="31.4 125.6"
-                  fill="none"
-                />
-              </svg>
+               <Spinner size={50} /> 
             </div>
           )}
 
