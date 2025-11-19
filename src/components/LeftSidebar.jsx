@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 const LeftSidebar = ({
   isCollapsed,
@@ -9,20 +9,14 @@ const LeftSidebar = ({
   setSelectedHistory,
 }) => {
 
-  const [theme, setTheme] = useState("dark");
-  useEffect(() => {
-    if (theme === "dark") {
-        document.documentElement.classList.add('dark')
-    } else {
-         document.documentElement.classList.remove('dark')
-    }
-  }, [theme]);
+
 
   return (
-    <div >
+
     <div
-      className={`
-        bg-zinc-800 h-full transition-all duration-300
+      className={` 
+        bg-zinc-400  text-black 
+      dark:bg-zinc-800 dark:text-white h-full transition-all duration-300
         ${isCollapsed ? "w-16" : "w-64"}
         sm:${isCollapsed ? "w-16" : "w-64"}  // small screens
         md:${isCollapsed ? "w-16" : "w-64"}  // medium screens
@@ -83,9 +77,9 @@ const LeftSidebar = ({
       {!isCollapsed && (
         <ul className="text-white p-4 text-left overflow-auto text-sm">
           {recentQuestions &&
-          recentQuestions.filter(
-            (item) => typeof item === "string" && item.trim() !== ""
-          ).length > 0 ? (
+            recentQuestions.filter(
+              (item) => typeof item === "string" && item.trim() !== ""
+            ).length > 0 ? (
             recentQuestions
               .filter((item) => typeof item === "string" && item.trim() !== "")
               .map((item, i) => (
@@ -103,24 +97,9 @@ const LeftSidebar = ({
         </ul>
       )}
 
-      <div className="fixed bottom-10 left-5 z-50">
-        <select
-          onChange={(e) => setTheme(e.target.value)}
-          name="theme"
-          id="theme-select"
-          className=" bg-zinc-800 text-white 
-            px-4 py-2 rounded-lg 
-            border border-zinc-700 
-            focus:outline-none focus:ring-2 focus:ring-blue-500 
-            cursor-pointer
-            transition-colors duration-200 "
-        >
-          <option value="dark">Dark</option>
-          <option value="light">Light</option>
-        </select>
-      </div>
+
     </div>
-    </div>
+
   );
 };
 

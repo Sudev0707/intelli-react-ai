@@ -196,64 +196,88 @@ const App = () => {
   };
 
   // dark mode
-  const [darkMode, setDarkMode] = useState("dark");
+  const [theme, setTheme] = useState("dark");
+  useEffect(() => {
+    console.log(theme);
+
+    if (theme === "dark") {
+      document.documentElement.classList.add('dark')
+    } else {
+      document.documentElement.classList.remove('dark')
+    }
+  }, [theme]);
 
   return (
     <>
-      <div className="grid grid-cols-5 text-center h-screen">
-        {/* left sidebar */}
-        <div className="col-span-1">
-          <LeftSidebar
-            isCollapsed={isCollapsed}
-            setIsCollapsed={setIsCollapsed}
-            newChat={newChat}
-            clearSearches={clearSearches}
-            recentQuestions={recentQuestions}
-            setSelectedHistory={setSelectedHistory}
-          />
-        </div>
-
-        <div className="col-span-4 p-10 ">
-          <h1 className="py-1 text-4xl bg-clip-text text-transparent bg-gradient-to-r from-pink-700 to-violet-800  ">
-            Hello, Ask me anything
-          </h1>
-
-          {loading && (
-            <div className="flex items-center justify-center">
-              <Spinner size={50} />
+      <div className={theme == 'dark' ? 'dark' : 'light'} >
+        <div className="grid grid-cols-5 text-center h-screen ">
+          {/* left sidebar */}
+          <div className="col-span-1 h-full">
+            <LeftSidebar
+              isCollapsed={isCollapsed}
+              setIsCollapsed={setIsCollapsed}
+              newChat={newChat}
+              clearSearches={clearSearches}
+              recentQuestions={recentQuestions}
+              setSelectedHistory={setSelectedHistory}
+            />
+            <div className="fixed bottom-10 left-5 z-50">
+              <select
+                onChange={(e) => setTheme(e.target.value)}
+                name="theme"
+                id="theme-select"
+                className=" bg-zinc-800 text-white outline-none  px-4 py-2 rounded-lg   transition-colors duration-200 " >
+                <option value="dark" className="bg-zinc-800 text-white">
+                  Dark
+                </option>
+                <option value="light" className=" bg-zinc-800 text-white">
+                  Light
+                </option>
+              </select>
             </div>
-          )}
+          </div>
 
-          <div
-            ref={scroll_Up}
-            className=" pb-10  container h-140 max-w-4xl   overflow-y-scroll chat-scroll"
-          >
-            <div className="text-zinc-200 ">
-              <ul>
-                {data.map((item, index) =>
-                  item.type == "q" ? (
-                    <li key={index} className="flex justify-end mt-4">
-                      <div className="max-w-[75%] bg-gradient-to-br from-[#1A1D21] to-[#2A2F34] text-white p-3 rounded-tl-4xl rounded-br-4xl rounded-bl-4xl  shadow-lg border border-white/10">
-                        <Answers ans={item.text} index={index} totalData={1} />
-                      </div>
-                    </li>
-                  ) : (
-                    item.text.map((ansItem, ansIndex) => (
-                      <li
-                        key={ansIndex + Math.random()}
-                        className="text-left p-1 text-white"
-                      >
-                        <Answers
-                          ans={ansItem}
-                          index={ansIndex}
-                          totalData={item.length}
-                        />
+          <div className="col-span-4 p-10 ">
+            <h1 className="py-1 text-4xl bg-clip-text text-transparent bg-gradient-to-r from-pink-700 to-violet-800  ">
+              Hello, Ask me anything
+            </h1>
+
+            {loading && (
+              <div className="flex items-center justify-center">
+                <Spinner size={50} />
+              </div>
+            )}
+
+            <div
+              ref={scroll_Up}
+              className=" pb-10  container h-140 max-w-4xl   overflow-y-scroll chat-scroll"
+            >
+              <div className="text-zinc-200 ">
+                <ul>
+                  {data.map((item, index) =>
+                    item.type == "q" ? (
+                      <li key={index} className="flex justify-end mt-4">
+                        <div className="max-w-[75%] bg-gradient-to-br from-[#1A1D21] to-[#2A2F34] text-white p-3 rounded-tl-4xl rounded-br-4xl rounded-bl-4xl  shadow-lg border border-white/10">
+                          <Answers ans={item.text} index={index} totalData={1} />
+                        </div>
                       </li>
-                    ))
-                  )
-                )}
+                    ) : (
+                      item.text.map((ansItem, ansIndex) => (
+                        <li
+                          key={ansIndex + Math.random()}
+                          className="text-left p-1 text-white"
+                        >
+                          <Answers
+                            ans={ansItem}
+                            index={ansIndex}
+                            totalData={item.length}
+                          />
+                        </li>
+                      ))
+                    )
+                  )}
 
-                {/* {data?.map((item, index) => (
+                  {/* {data?.map((item, index) => (
                   <li
                     key={index + Math.random()}
                     className="text-left p-1 text-white"
@@ -261,27 +285,28 @@ const App = () => {
                     <Answers ans={item} index={index} totalData={data.length} />
                   </li>
                 ))} */}
-              </ul>
+                </ul>
+              </div>
             </div>
-          </div>
 
-          <div className=" items-center   bg-zinc-800 w-1/2 p-1 pr-4  text-white m-auto rounded-4xl border border-zinc-700 flex h-16 ">
-            <input
-              onKeyDown={isEnter}
-              value={question}
-              onChange={(e) => setQuestion(e.target.value)}
-              type="text"
-              placeholder="ask me anything"
-              className="w-full h-full p-3 outline-none  "
-            />
-            {!question == "" && (
-              <button
-                onClick={askQuestion}
-                className="cursor-pointer flex py-1.5 px-4 rounded-4xl bg-zinc-600  "
-              >
-                Ask
-              </button>
-            )}
+            <div className=" items-center   bg-zinc-800 w-1/2 p-1 pr-4  text-white m-auto rounded-4xl border border-zinc-700 flex h-16 ">
+              <input
+                onKeyDown={isEnter}
+                value={question}
+                onChange={(e) => setQuestion(e.target.value)}
+                type="text"
+                placeholder="ask me anything"
+                className="w-full h-full p-3 outline-none  "
+              />
+              {!question == "" && (
+                <button
+                  onClick={askQuestion}
+                  className="cursor-pointer flex py-1.5 px-4 rounded-4xl bg-zinc-600  "
+                >
+                  Ask
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </div>
