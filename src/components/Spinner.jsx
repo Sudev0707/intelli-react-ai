@@ -8,7 +8,7 @@ const Spinner = ({ size = 40, darkColor = "#4F46E5", brightColor = "#A855F7" }) 
         width={size}
         height={size}
         viewBox="0 0 50 50"
-      >
+      >        
         <circle
           className="opacity-20"
           cx="25"

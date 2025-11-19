@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 const LeftSidebar = ({
   isCollapsed,
@@ -8,7 +8,18 @@ const LeftSidebar = ({
   recentQuestions,
   setSelectedHistory,
 }) => {
+
+  const [theme, setTheme] = useState("dark");
+  useEffect(() => {
+    if (theme === "dark") {
+        document.documentElement.classList.add('dark')
+    } else {
+         document.documentElement.classList.remove('dark')
+    }
+  }, [theme]);
+
   return (
+    <div >
     <div
       className={`
         bg-zinc-800 h-full transition-all duration-300
@@ -30,7 +41,6 @@ const LeftSidebar = ({
         </button>
       </div>
 
-      {/* New Chat */}
       <div className="mb-3">
         <button
           onClick={newChat}
@@ -49,7 +59,6 @@ const LeftSidebar = ({
         </button>
       </div>
 
-      {/* Recent Searches Header */}
       <div className="flex justify-between items-center px-5">
         {!isCollapsed && (
           <h3 className="text-md text-zinc-200 text-left">Recent search</h3>
@@ -71,7 +80,6 @@ const LeftSidebar = ({
         </button>
       </div>
 
-      {/* Recent Questions */}
       {!isCollapsed && (
         <ul className="text-white p-4 text-left overflow-auto text-sm">
           {recentQuestions &&
@@ -94,6 +102,24 @@ const LeftSidebar = ({
           )}
         </ul>
       )}
+
+      <div className="fixed bottom-10 left-5 z-50">
+        <select
+          onChange={(e) => setTheme(e.target.value)}
+          name="theme"
+          id="theme-select"
+          className=" bg-zinc-800 text-white 
+            px-4 py-2 rounded-lg 
+            border border-zinc-700 
+            focus:outline-none focus:ring-2 focus:ring-blue-500 
+            cursor-pointer
+            transition-colors duration-200 "
+        >
+          <option value="dark">Dark</option>
+          <option value="light">Light</option>
+        </select>
+      </div>
+    </div>
     </div>
   );
 };
