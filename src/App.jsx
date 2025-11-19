@@ -5,8 +5,8 @@ import viteLogo from "/vite.svg";
 import "./App.css";
 import { GEMINI_URL } from "./constants";
 import Answers from "./components/Answers";
-import LeftSidebar from "./components/leftSidebar";
 import Spinner from "./components/Spinner";
+import SideBar from "./components/SideBar";
 
 const App = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -213,7 +213,7 @@ const App = () => {
         <div className="grid grid-cols-5 text-center h-screen ">
           {/* left sidebar */}
           <div className="col-span-1 h-full">
-            <LeftSidebar
+            <SideBar
               isCollapsed={isCollapsed}
               setIsCollapsed={setIsCollapsed}
               newChat={newChat}
