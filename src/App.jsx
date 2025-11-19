@@ -74,26 +74,29 @@ const App = () => {
           )}
         </div>
 
-        <div className="col-span-4 p-10">
-          <div className="container h-150 overflow-y-scroll chat-scroll">
+        <div className="col-span-4 p-10 ">
+          <div className="container h-150 max-w-4xl   overflow-y-scroll chat-scroll">
             <div className="text-zinc-200 ">
               <ul>
                 {data.map((item, index) =>
                   item.type == "q" ? (
-                    <li
-                      key={index + Math.random()}
-                      className="text-left p-1 text-white"
-                    >
-                      <Answers ans={item.text} index={index} totalData={1} />
+                    <li key={index} className="flex justify-end mt-4">
+                      <div className="max-w-[75%] bg-gradient-to-br from-[#1A1D21] to-[#2A2F34] text-white p-3 rounded-tl-4xl rounded-br-4xl rounded-bl-4xl  shadow-lg border border-white/10">
+                        <Answers ans={item.text} index={index} totalData={1} />
+                      </div>
                     </li>
                   ) : (
                     item.text.map((ansItem, ansIndex) => (
-                        <li
-                      key={ansIndex + Math.random()}
-                      className="text-left p-1 text-white"
-                    >
-                      <Answers ans={ansItem} index={ansIndex} totalData={item.length} />
-                    </li>
+                      <li
+                        key={ansIndex + Math.random()}
+                        className="text-left p-1 text-white"
+                      >
+                        <Answers
+                          ans={ansItem}
+                          index={ansIndex}
+                          totalData={item.length}
+                        />
+                      </li>
                     ))
                   )
                 )}
