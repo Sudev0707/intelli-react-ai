@@ -9,6 +9,7 @@ const App = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [question, setQuestion] = useState("");
   const [data, setData] = useState([]);
+  const [recentQuestions, setRecentQuestions] = useState(JSON.parse(localStorage.getItem("questions")));
 
   const GEMINI_API_KEY = "AIzaSyDgrivbfetqlWmpRyCm6cKvgkN7qNLZczQ";
 
@@ -21,6 +22,18 @@ const App = () => {
   };
 
   const askQuestion = async () => {
+    // for questions history
+    if (localStorage.getItem("questions")) {
+      let history = JSON.parse(localStorage.getItem("questions"));
+      history = [question, ...history];
+
+      localStorage.setItem("questions", JSON.stringify(history));
+      setRecentQuestions([history]);
+    } else {
+      localStorage.setItem("questions", JSON.stringify([question]));
+      setRecentQuestions([question]);
+    }
+
     try {
       let res = await fetch(GEMINI_URL + GEMINI_API_KEY, {
         method: "POST",
@@ -67,9 +80,9 @@ const App = () => {
           </div>
           {!isCollapsed && (
             <ul className="text-white p-4 space-y-4">
-              {/* <li className="cursor-pointer hover:text-gray-300">New Chat</li>
-              <li className="cursor-pointer hover:text-gray-300">History 1</li>
-              <li className="cursor-pointer hover:text-gray-300">History 2</li> */}
+             {recentQuestions && recentQuestions.map((item)=>(
+              <li className="border-2 ">{item}</li>
+             ))}
             </ul>
           )}
         </div>
