@@ -237,7 +237,7 @@ const App = () => {
             </div>
           </div>
 
-          <div className="col-span-4 p-10 ">
+          <div className="col-span-4 p-10 flex flex-col items-center ">
             <h1 className="py-1 text-4xl bg-clip-text text-transparent bg-gradient-to-r from-pink-700 to-violet-800  ">
               Hello, Ask me anything
             </h1>
@@ -250,7 +250,7 @@ const App = () => {
 
             <div
               ref={scroll_Up}
-              className=" pb-10  container h-140 max-w-4xl   overflow-y-scroll chat-scroll"
+              className=" pb-15  container h-160  max-w-6xl  overflow-y-scroll chat-scroll"
             >
               <div className="text-zinc-200 ">
                 <ul>
@@ -289,7 +289,7 @@ const App = () => {
               </div>
             </div>
 
-            <div className=" items-center   bg-zinc-800 w-1/2 p-1 pr-4  text-white m-auto rounded-4xl border border-zinc-700 flex h-16 ">
+            <div className="mt-2 fixed bottom-15   items-center   bg-zinc-800 w-2xl  p-1 pr-4  text-white m-auto rounded-4xl border border-zinc-700 flex h-16 ">
               <input
                 onKeyDown={isEnter}
                 value={question}
