@@ -9,19 +9,17 @@ const SideBar = ({
     setSelectedHistory,
 }) => {
     return (
-        <div>
+        <>
             <div
                 className={` 
-        bg-zinc-400  text-black 
-      dark:bg-zinc-800 dark:text-white h-full transition-all duration-300
-        ${isCollapsed ? "w-16" : "w-64"}
-        sm:${isCollapsed ? "w-16" : "w-64"}  // small screens
-        md:${isCollapsed ? "w-16" : "w-64"}  // medium screens
-        lg:${isCollapsed ? "w-20" : "w-64"}  // large screens
-        xl:${isCollapsed ? "w-20" : "w-64"}  // extra large screens
-        flex flex-col
-      `}
-            >
+                    bg-zinc-400  text-black 
+                   dark:bg-zinc-800 dark:text-white h-full transition-all duration-300
+                    ${isCollapsed ? "w-16" : "w-64"}
+                    sm:${isCollapsed ? "w-16" : "w-64"}  // small screens
+                    md:${isCollapsed ? "w-16" : "w-64"}  // medium screens
+                    lg:${isCollapsed ? "w-20" : "w-64"}  // large screens
+                    xl:${isCollapsed ? "w-20" : "w-64"}  // extra large screens
+                    flex flex-col `} >
                 {/* Collapse Button */}
                 <div className="p-4 flex justify-end">
                     <button
@@ -96,7 +94,7 @@ const SideBar = ({
 
 
             </div>
-        </div>
+        </>
     )
 }
 
