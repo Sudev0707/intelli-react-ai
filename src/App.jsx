@@ -1,131 +1,254 @@
-import { useState, useEffect, useref } from "react";
+import { useState, useEffect, useRef } from "react";
+
 import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
 import "./App.css";
 import { GEMINI_URL } from "./constants";
 import Answers from "./components/Answers";
+import LeftSidebar from "./components/leftSidebar";
 
 const App = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [question, setQuestion] = useState("");
   const [data, setData] = useState([]);
   const [recentQuestions, setRecentQuestions] = useState(
-    JSON.parse(localStorage.getItem("questions")) || []
+    JSON.parse(localStorage.getItem("questions"))
   );
+  const [selectdHistory, setSelectedHistory] = useState("");
+  const [conversation, setConversation] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const scroll_Up = useRef(null);
 
   const GEMINI_API_KEY = "AIzaSyDgrivbfetqlWmpRyCm6cKvgkN7qNLZczQ";
 
-  const payload = {
-    contents: [
-      {
-        parts: [{ text: question }],
-      },
-    ],
-  };
-
   const askQuestion = async () => {
-    // for questions history
-    if (localStorage.getItem("questions")) {
-      let history = JSON.parse(localStorage.getItem("questions"));
-      history = [question, ...history];
+    const userQuery = question || selectdHistory;
+    if (!userQuery) return;
 
-      localStorage.setItem("questions", JSON.stringify(history));
-      setRecentQuestions([history]);
-    } else {
-      localStorage.setItem("questions", JSON.stringify([question]));
-      setRecentQuestions([question]);
+    if (question) {
+      // get old history or empty list
+      let oldHistory = JSON.parse(localStorage.getItem("questions")) || [];
+
+      // remove if exists (avoid duplicates)
+      oldHistory = oldHistory.filter((q) => q !== question);
+
+      // add new question at top
+      const newHistory = [question, ...oldHistory];
+
+      // save to localStorage
+      localStorage.setItem("questions", JSON.stringify(newHistory));
+
+      // update state correctly
+      setRecentQuestions(newHistory);
     }
 
-    try {
-      let res = await fetch(GEMINI_URL + GEMINI_API_KEY, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
-      const result = await res.json();
+    // Add user message to conversation
+    const newConversation = [
+      ...conversation,
+      { role: "user", text: userQuery },
+    ];
 
-      let unFormatData =
-        result.candidates?.[0]?.content?.parts?.[0]?.text || "";
+    setConversation(newConversation);
 
-      let formatedData = unFormatData.includes("* ")
-        ? unFormatData.split("* ").map((item) => item.trim())
-        : [unFormatData];
+    setLoading(true);
 
-      // setData([question, formatedData]);
-      setData([
-        ...data,
-        { type: "q", text: question },
-        { type: "a", text: formatedData },
-      ]);
-    } catch (error) {
-      console.log(error.message);
+    // Send full conversation to Gemini
+    const payload = {
+      contents: newConversation.map((msg) => ({
+        role: msg.role,
+        parts: [{ text: msg.text }],
+      })),
+    };
+
+    let res = await fetch(GEMINI_URL + GEMINI_API_KEY, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    const json = await res.json();
+    const answer = json.candidates?.[0]?.content?.parts?.[0]?.text || "";
+
+    // Add AI answer to conversation
+    setConversation((prev) => [...prev, { role: "model", text: answer }]);
+
+    // Also push into your chat UI
+    setData((prev) => [
+      ...prev,
+      { type: "q", text: userQuery },
+      { type: "a", text: [answer] },
+    ]);
+
+    setQuestion("");
+
+    scroll_Up.current.scrollTo({
+      top: scroll_Up.current.scrollHeight,
+      behavior: "smooth",
+    });
+    setLoading(false);
+  };
+
+  // const askQuestion = async () => {
+  //   if (!question && !selectdHistory) return;
+
+  //   // if (question) {
+  //   //   // for questions history
+  //   //   if (localStorage.getItem("questions")) {
+  //   //     let history = JSON.parse(localStorage.getItem("questions"));
+  //   //     history = [question, ...history];
+
+  //   //     localStorage.setItem("questions", JSON.stringify(history));
+  //   //     setRecentQuestions([history]);
+  //   //   } else {
+  //   //     localStorage.setItem("questions", JSON.stringify([question]));
+  //   //     setRecentQuestions([question]);
+  //   //   }
+
+  //   // }
+
+  //   if (question) {
+  //     // load existing or empty list
+  //     let oldHistory = JSON.parse(localStorage.getItem("questions")) || [];
+
+  //     // remove the question if it already exists
+  //     oldHistory = oldHistory.filter((q) => q !== question);
+
+  //     // add new question at the top
+  //     const newHistory = [question, ...oldHistory];
+
+  //     // save
+  //     localStorage.setItem("questions", JSON.stringify(newHistory));
+
+  //     // update UI
+  //     setRecentQuestions(newHistory);
+  //   }
+
+  //   const payloadData = question ? question : selectdHistory;
+  //   const payload = {
+  //     contents: [
+  //       {
+  //         parts: [{ text: payloadData }],
+  //       },
+  //     ],
+  //   };
+
+  //   try {
+  //     let res = await fetch(GEMINI_URL + GEMINI_API_KEY, {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify(payload),
+  //     });
+  //     const result = await res.json();
+
+  //     let unFormatData =
+  //       result.candidates?.[0]?.content?.parts?.[0]?.text || "";
+
+  //     let formatedData = unFormatData.includes("* ")
+  //       ? unFormatData.split("* ").map((item) => item.trim())
+  //       : [unFormatData];
+
+  //     // let formatedData = unFormatData.includes("* ")
+  //     //   ? unFormatData
+  //     //       .split("* ")
+  //     //       .map((item) => item.trim())
+  //     //       .filter(Boolean)
+  //     //   : unFormatData
+  //     //       .split(/[0-9]+\.\s+/)
+  //     //       .map((i) => i.trim())
+  //     //       .filter(Boolean);
+
+  //     // setData([question, formatedData]);
+  //     setData([
+  //       ...data,
+  //       { type: "q", text: question ? question : selectdHistory },
+  //       { type: "a", text: formatedData },
+  //     ]);
+
+  //     setQuestion("");
+  //   } catch (error) {
+  //     console.log(error.message);
+  //   }
+  // };
+
+  const clearSearches = () => {
+    localStorage.removeItem("questions");
+    setRecentQuestions([]);
+  };
+
+  const isEnter = (e) => {
+    if (e.key == "Enter") {
+      askQuestion();
+      setQuestion("");
     }
   };
 
-  const clerSearches = () => {
-    localStorage.removeItem('questions')
-    setRecentQuestions([]);
+  useEffect(() => {
+    // console.log(typeof selectdHistory);
+    askQuestion();
+    setQuestion("");
+  }, [selectdHistory]);
 
+  const newChat = () => {
+    setData([]);
   };
 
   return (
     <>
       <div className="grid grid-cols-5 text-center h-screen">
         {/* left sidebar */}
-        <div
-          className={` col-span-1 bg-zinc-800 h-full transition-all duration-300
-        ${isCollapsed ? "w-16 col-span-1" : "w-64 col-span-1"} `}
-        >
-          <div className="p-4 flex justify-end">
-            <button
-              onClick={() => setIsCollapsed(!isCollapsed)}
-              className="text-white bg-zinc-700 px-2 py-1 rounded hover:bg-zinc-600"
-            >
-              {isCollapsed ? "➡" : "⬅"}
-            </button>
-          </div>
-          <div className="flex justify-between">
-            <h3 className="text-xl text-zinc-200 text-left pl-5 ">
-              Recent search
-            </h3>
-            <button className="pe-5 cursor-pointer " onClick={clerSearches}>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                height="24px"
-                viewBox="0 -960 960 960"
-                width="24px"
-                fill="#e3e3e3"
-              >
-                <path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z" />
-              </svg>
-            </button>
-          </div>
-          {!isCollapsed && (
-            <ul className="text-white p-4  text-left overflow-auto text-sm">
-              {recentQuestions &&
-              recentQuestions.filter((item) => item.trim() !== "").length >
-                0 ? (
-                recentQuestions
-                  .filter((item) => item.trim() !== "")
-                  .map((item, i) => (
-                    <li
-                      key={i}
-                      className="block p-1 pl-4 text-zinc-300 cursor-pointer hover:bg-zinc-700 truncate"
-                    >
-                      {item}
-                    </li>
-                  ))
-              ) : (
-                <li className="text-zinc-500 italic">No recent searches</li>
-              )}
-            </ul>
-          )}
+        <div className="col-span-1">
+          <LeftSidebar
+            isCollapsed={isCollapsed}
+            setIsCollapsed={setIsCollapsed}
+            newChat={newChat}
+            clearSearches={clearSearches}
+            recentQuestions={recentQuestions}
+            setSelectedHistory={setSelectedHistory}
+          />
         </div>
 
         <div className="col-span-4 p-10 ">
-          <div className="container h-150 max-w-4xl   overflow-y-scroll chat-scroll">
+          <h1 className="py-1 text-4xl bg-clip-text text-transparent bg-gradient-to-r from-pink-700 to-violet-800  ">
+            Hello, Ask me anything
+          </h1>
+
+          {loading && (
+            <div className="flex items-center justify-center">
+              <svg
+                className="animate-spin"
+                width="40"
+                height="40"
+                viewBox="0 0 50 50"
+              >
+                <circle
+                  className="opacity-20"
+                  cx="25"
+                  cy="25"
+                  r="20"
+                  stroke="#4F46E5" /* dark purple ring */
+                  strokeWidth="4"
+                  fill="none"
+                />
+                <circle
+                  cx="25"
+                  cy="25"
+                  r="20"
+                  stroke="#A855F7" /* bright purple arc */
+                  strokeWidth="4"
+                  strokeLinecap="round"
+                  strokeDasharray="31.4 125.6"
+                  fill="none"
+                />
+              </svg>
+            </div>
+          )}
+
+          <div
+            ref={scroll_Up}
+            className=" pb-10  container h-140 max-w-4xl   overflow-y-scroll chat-scroll"
+          >
             <div className="text-zinc-200 ">
               <ul>
                 {data.map((item, index) =>
@@ -163,17 +286,23 @@ const App = () => {
             </div>
           </div>
 
-          <div className="  bg-zinc-800 w-1/2 p-1 pr-4  text-white m-auto rounded-4xl border border-zinc-700 flex h-16 ">
+          <div className=" items-center   bg-zinc-800 w-1/2 p-1 pr-4  text-white m-auto rounded-4xl border border-zinc-700 flex h-16 ">
             <input
+              onKeyDown={isEnter}
               value={question}
               onChange={(e) => setQuestion(e.target.value)}
               type="text"
               placeholder="ask me anything"
               className="w-full h-full p-3 outline-none  "
             />
-            <button onClick={askQuestion} className="cursor-pointer">
-              Ask
-            </button>
+            {!question == "" && (
+              <button
+                onClick={askQuestion}
+                className="cursor-pointer flex py-1.5 px-4 rounded-4xl bg-zinc-600  "
+              >
+                Ask
+              </button>
+            )}
           </div>
         </div>
       </div>
