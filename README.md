@@ -1,7 +1,7 @@
 
 ## 🚀Intelli React AI
 
-An advanced AI-powered conversational assistant built with React and integrated with the Google Gemini API. Designed to be fast, clean, and modern — similar to Google Gemini or ChatGPT — this application delivers powerful real-time responses with smooth rendering and automatic chat persistence using localStorage.
+An AI-powered conversational assistant built with React and integrated with the Google Gemini API. Designed to be fast, clean, and modern — similar to Google Gemini or ChatGPT — this application delivers powerful real-time responses with smooth rendering and automatic chat persistence using localStorage.
 
 ## 🔗View
 [![Live Demo](https://img.shields.io/badge/Live-Demo-blue)](https://intelli-react-ai.vercel.app/)
